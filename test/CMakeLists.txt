@@ -1,5 +1,5 @@
 # We need thread support
-#find_package(Threads REQUIRED)
+find_package(Threads REQUIRED)
 
 # Enable ExternalProject CMake module
 include(ExternalProject)
@@ -7,12 +7,11 @@ include(ExternalProject)
 # Download and install GoogleTest
 ExternalProject_Add(
         gtest
-        URL https://googletest.googlecode.com/files/gtest-1.7.0.zip
+        URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
         PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
         CMAKE_ARGS
             -DCMAKE_CXX_STANDARD=11
             -DCMAKE_CXX_STANDARD_REQUIRED=ON
-        # Disable install step
         INSTALL_COMMAND ""
 )
 
@@ -25,20 +24,18 @@ ExternalProject_Get_Property(gtest source_dir binary_dir)
 set_target_properties(libgtest PROPERTIES
         "IMPORTED_LOCATION" "${binary_dir}/libgtest.a"
         "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-        #    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
         )
-# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
+
 include_directories("${source_dir}/include")
 
 # Download and install GoogleMock
 ExternalProject_Add(
         gmock
-        URL https://googlemock.googlecode.com/files/gmock-1.7.0.zip
+        URL http://googlemock.googlecode.com/files/gmock-1.7.0.zip
         PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gmock
         CMAKE_ARGS
             -DCMAKE_CXX_STANDARD=11
             -DCMAKE_CXX_STANDARD_REQUIRED=ON
-        # Disable install step
         INSTALL_COMMAND ""
 )
 
@@ -51,22 +48,8 @@ ExternalProject_Get_Property(gmock source_dir binary_dir)
 set_target_properties(libgmock PROPERTIES
         "IMPORTED_LOCATION" "${binary_dir}/libgmock.a"
         "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-        #    "INTERFACE_INCLUDE_DIRECTORIES" "${source_dir}/include"
         )
-# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
+
 include_directories("${source_dir}/include")
 
-# add test resources and create a runnable.
-set(SOURCE_FILES
-        "EkfTest.cpp"
-        )
-
-add_executable(testekf ${SOURCE_FILES})
-
-target_link_libraries(testekf
-        ekf
-        ${GTEST_LIBRARIES}
-        ${GMOCK_LIBRARIES}
-        )
-
-install(TARGETS testekf DESTINATION bin)
+add_subdirectory(ekf)
